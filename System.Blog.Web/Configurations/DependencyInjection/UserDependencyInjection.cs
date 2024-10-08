@@ -11,11 +11,13 @@ public static class UserDependencyInjection
 {
     public static IServiceCollection AddUserDependencies(this IServiceCollection services)
     {
-        services.AddScoped<IUserRepository, UserRepository>();
         services.AddMemoryCache();
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IGetAllUserUseCase, GetAllUserUseCase>();
-        services.AddScoped<ICreateUserUseCase, CreateUserUseCase>();
+        services.AddScoped<IInitiateUserRegistrationUseCase, InitiateUserRegistrationUseCase>();
+        services.AddScoped<IResendVerificationCodeUseCase, ResendVerificationCodeUseCase>();
+        services.AddScoped<ICompleteUserRegistrationUseCase, CompleteUserRegistrationUseCase>();
         return services;
     }
 }

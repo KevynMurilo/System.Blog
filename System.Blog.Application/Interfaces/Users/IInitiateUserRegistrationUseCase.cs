@@ -1,10 +1,9 @@
 ﻿using System.Blog.Application.DTOs;
-using System.Blog.Core.Entities;
-using System.Blog.Core.Responses;
+using System.Blog.Application.Responses;
 
 namespace System.Blog.Application.Interfaces.Users;
 
-public interface ICreateUserUseCase
+public interface IInitiateUserRegistrationUseCase
 {
     Task<OperationResult<UserResponse>> ExecuteAsync(CreateUserDto userDto);
 }

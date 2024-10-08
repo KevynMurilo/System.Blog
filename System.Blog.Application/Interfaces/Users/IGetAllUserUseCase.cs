@@ -1,4 +1,4 @@
-﻿using System.Blog.Core.Responses;
+﻿using System.Blog.Application.Responses;
 
 namespace System.Blog.Application.Interfaces.Users;
 

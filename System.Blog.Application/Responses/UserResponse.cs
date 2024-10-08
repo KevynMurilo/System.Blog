@@ -1,6 +1,4 @@
-﻿using System.Blog.Core.Entities;
-
-namespace System.Blog.Core.Responses;
+﻿namespace System.Blog.Application.Responses;
 
 public class UserResponse
 {
@@ -8,5 +6,8 @@ public class UserResponse
     public string Name { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Role { get; set; } = string.Empty;
-    public string? PhotoPath { get; set; }
+    public DateTime CreatedDate { get; set; }
+    public DateTime? UpdatedDate { get; set; }
+    public bool IsActived { get; set; }
+    public string? Photo { get; set; }
 }

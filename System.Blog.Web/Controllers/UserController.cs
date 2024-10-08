@@ -10,16 +10,22 @@ namespace System.Blog.Web.Controllers;
 public class UserController : ControllerBase
 {
     private readonly IGetAllUserUseCase _getAllUserUseCase;
-    private readonly ICreateUserUseCase _createUserUseCase;
+    private readonly IInitiateUserRegistrationUseCase _initiateUserRegistrationUseCase;
+    private readonly ICompleteUserRegistrationUseCase _completeUserRegistrationUseCase;
+    private readonly IResendVerificationCodeUseCase _resendVerificationCodeUseCase;
     private readonly IMemoryCache _cache;
 
     public UserController(
         IGetAllUserUseCase getAllUserUseCase,
-        ICreateUserUseCase createUserUseCase,
+        IInitiateUserRegistrationUseCase initiateUserRegistrationUseCase,
+        ICompleteUserRegistrationUseCase completeUserRegistrationUseCase,
+        IResendVerificationCodeUseCase resendVerificationCodeUseCase,
         IMemoryCache cache)
     {
         _getAllUserUseCase = getAllUserUseCase;
-        _createUserUseCase = createUserUseCase;
+        _initiateUserRegistrationUseCase = initiateUserRegistrationUseCase;
+        _completeUserRegistrationUseCase = completeUserRegistrationUseCase;
+        _resendVerificationCodeUseCase = resendVerificationCodeUseCase;
         _cache = cache;
     }
 
@@ -42,7 +48,7 @@ public class UserController : ControllerBase
     {
         try
         {
-            var result = await _createUserUseCase.ExecuteAsync(userDto);
+            var result = await _initiateUserRegistrationUseCase.ExecuteAsync(userDto);
             return StatusCode(result.StatusCode, result);
         }
         catch (Exception ex)
@@ -51,17 +57,33 @@ public class UserController : ControllerBase
         }
     }
 
-    [HttpPost("verify-email")]
-    public IActionResult VerifyEmail(string email, string code)
+    [HttpPost("complete-registration")]
+    public async Task<IActionResult> VerifyEmailAsync(string email, string code)
     {
-        if (_cache.TryGetValue(email, out string? storedCode))
+        try
         {
-            if (storedCode.Equals(code, StringComparison.OrdinalIgnoreCase))
-            {
-                _cache.Remove(email);
-                return Ok("Email verified successfully.");
-            }
+            var result = await _completeUserRegistrationUseCase.ExecuteAsync(email, code);
+            return StatusCode(result.StatusCode, result.Message);
         }
-        return BadRequest("Invalid or expired verification code.");
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An unexpected error has occurred. - {ex}");
+        }
     }
+
+    [HttpPost("resend-verification")]
+    public async Task<IActionResult> ResendVerificationCodeAsync(string email)
+    {
+        try
+        {
+            var result = await _resendVerificationCodeUseCase.ExecuteAsync(email);
+            return StatusCode(result.StatusCode, result.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An unexpected error has occurred. - {ex}");
+
+        }
+    }
+
 }
