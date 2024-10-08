@@ -46,8 +46,10 @@ namespace System.Blog.Infrastructure.Migrations
                     Email = table.Column<string>(type: "text", nullable: false),
                     PasswordHash = table.Column<string>(type: "text", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsActived = table.Column<bool>(type: "boolean", nullable: false),
                     Role = table.Column<int>(type: "integer", nullable: false),
-                    PhotoPath = table.Column<string>(type: "text", nullable: true)
+                    Photo = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {

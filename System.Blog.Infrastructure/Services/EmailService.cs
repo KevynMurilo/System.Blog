@@ -13,7 +13,7 @@ public class EmailService : IEmailService
         _configuration = configuration;
     }
 
-    public async Task SendVerificationEmailAsync(string email, string verificationCode)
+    public async Task SendVerificationEmailAsync(string email, string verificationCode, string name)
     {
         var smtpEmail = _configuration["EmailSettings:SmtpEmail"];
         var smtpPassword = _configuration["EmailSettings:SmtpPassword"];
@@ -24,7 +24,7 @@ public class EmailService : IEmailService
         {
             From = new MailAddress(smtpEmail, "Kevyn.Dev"),
             Subject = "Confirme seu endereço de e-mail",
-            Body = EmailTemplates.GenerateVerificationEmailBody(verificationCode), 
+            Body = EmailTemplates.GenerateVerificationEmailBody(verificationCode, name), 
             IsBodyHtml = true 
         };
 

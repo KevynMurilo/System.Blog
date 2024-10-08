@@ -6,8 +6,10 @@ public class User
     public string Email { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
+    public DateTime? UpdatedDate { get; set; }
+    public bool IsActived { get; set; }
     public UserRole Role { get; set; } = UserRole.READER;
-    public string? PhotoPath { get; set; }
+    public string? Photo { get; set; }
 
     public ICollection<Post>? Posts { get; set; }
     public ICollection<Comment>? Comments { get; set; }

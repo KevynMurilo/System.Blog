@@ -2,7 +2,7 @@
 
 public static class EmailTemplates
 {
-    public static string GenerateVerificationEmailBody(string verificationCode)
+    public static string GenerateVerificationEmailBody(string verificationCode, string name)
     {
         return $@"
         <html>
@@ -60,7 +60,7 @@ public static class EmailTemplates
                     Confirme seu endereço de e-mail
                 </div>
                 <div class='content'>
-                    <p>Olá,</p>
+                    <p>Olá {name},</p>
                     <p>Obrigado por se registrar no nosso sistema. Para confirmar seu endereço de e-mail, utilize o código de verificação abaixo:</p>
                     <span class='verification-code'>{verificationCode}</span>
                     <p>Se você não solicitou essa verificação, por favor, ignore este e-mail.</p>

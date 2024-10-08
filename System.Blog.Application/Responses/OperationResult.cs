@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace System.Blog.Core.Responses;
+namespace System.Blog.Application.Responses;
 
 public class OperationResult<T>
 {
