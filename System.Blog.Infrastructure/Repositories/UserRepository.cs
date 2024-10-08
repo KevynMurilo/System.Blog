@@ -29,6 +29,20 @@ public class UserRepository : IUserRepository
                 .ToListAsync();
     }
 
+    public async Task<UserResponse?> GetByEmailAsync(string email)
+    {
+        return await _context.Users
+            .Select(user => new UserResponse
+            {
+                UserId= user.UserId,
+                Name = user.Name,
+                Email = user.Email,
+                Role = user.Role.ToString(),
+                PhotoPath = user.PhotoPath
+            })
+            .FirstOrDefaultAsync(e => e.Email == email);       
+    }
+
     public async Task AddAsync(User user)
     {
         _context.Users.Add(user);
