@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -20,10 +20,6 @@
   <ItemGroup>
     <ProjectReference Include="..\System.Blog.Application\System.Blog.Application.csproj" />
     <ProjectReference Include="..\System.Blog.Infrastructure\System.Blog.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Uploads\UserProfiles\" />
   </ItemGroup>
 
 </Project>
