@@ -1,14 +1,14 @@
 ﻿using System.Blog.Core.Contracts.Repositories;
-using System.Blog.Application.Interfaces.Users;
 using System.Blog.Application.Responses;
+using System.Blog.Application.Interfaces.Users.UserManagement;
 
-namespace System.Blog.Application.UseCases.Users;
+namespace System.Blog.Application.UseCases.Users.UserManagement;
 
-public class GetAllUserUseCase : IGetAllUserUseCase
+public class GetAllUsersUseCase : IGetAllUsersUseCase
 {
     private readonly IUserRepository _userRepository;
 
-    public GetAllUserUseCase(IUserRepository userRepository)
+    public GetAllUsersUseCase(IUserRepository userRepository)
     {
         _userRepository = userRepository;
     }

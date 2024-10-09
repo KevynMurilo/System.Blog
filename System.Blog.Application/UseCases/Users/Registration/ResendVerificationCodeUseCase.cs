@@ -1,11 +1,11 @@
 ﻿using System.Blog.Core.Contracts.Repositories;
 using Microsoft.Extensions.Caching.Memory;
-using System.Blog.Application.Interfaces.Users;
 using System.Blog.Core.Contracts.Services;
 using System.Blog.Application.Utils;
 using System.Blog.Application.Responses;
+using System.Blog.Application.Interfaces.Users.Registration;
 
-namespace System.Blog.Application.UseCases.Users;
+namespace System.Blog.Application.UseCases.Users.Registration;
 
 public class ResendVerificationCodeUseCase : IResendVerificationCodeUseCase
 {
@@ -26,14 +26,14 @@ public class ResendVerificationCodeUseCase : IResendVerificationCodeUseCase
         var lowerEmail = email.ToLower();
         var user = await _userRepository.GetByEmailAsync(lowerEmail);
         if (user == null)
-            return new OperationResult<string> { ReqSuccess = false, Message = "User not found.", StatusCode = 404 };
+            return new OperationResult<string> { Message = "User not found.", StatusCode = 404 };
 
         if (_cache.TryGetValue(lowerEmail, out (string StoredCode, DateTime LastSentTime) data))
         {
             var timeSinceLastSent = DateTime.UtcNow - data.LastSentTime;
             if (timeSinceLastSent.TotalMinutes < CooldownMinutes)
             {
-                return new OperationResult<string> { ReqSuccess = false, Message = $"Please wait {CooldownMinutes} minutes before requesting another code.", StatusCode = 429 };
+                return new OperationResult<string> { Message = $"Please wait {CooldownMinutes} minutes before requesting another code.", StatusCode = 429 };
             }
         }
 
@@ -44,6 +44,6 @@ public class ResendVerificationCodeUseCase : IResendVerificationCodeUseCase
 
         await _emailService.SendVerificationEmailAsync(email, newCode, user.Name);
 
-        return new OperationResult<string> { ReqSuccess = true, Message = "Verification code resent successfully.", StatusCode = 200 };
+        return new OperationResult<string> { Message = "Verification code resent successfully.", StatusCode = 200 };
     }
 }

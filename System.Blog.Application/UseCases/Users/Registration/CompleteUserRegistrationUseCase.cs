@@ -1,10 +1,10 @@
 ﻿using System.Blog.Core.Contracts.Repositories;
 using Microsoft.Extensions.Caching.Memory;
-using System.Blog.Application.Interfaces.Users;
 using System.Blog.Core.Contracts.Services;
 using System.Blog.Application.Responses;
+using System.Blog.Application.Interfaces.Users.Registration;
 
-namespace System.Blog.Application.UseCases.Users;
+namespace System.Blog.Application.UseCases.Users.Registration;
 
 public class CompleteUserRegistrationUseCase : ICompleteUserRegistrationUseCase
 {
@@ -32,10 +32,10 @@ public class CompleteUserRegistrationUseCase : ICompleteUserRegistrationUseCase
                 {
                     user.IsActived = true;
                     await _userRepository.UpdateAsync(user);
-                    _cache.Remove(lowerEmail); 
+                    _cache.Remove(lowerEmail);
                     return new OperationResult<string> { Message = "Email verified successfully. User activated." };
                 }
-                return new OperationResult<string> { ReqSuccess = false, Message = "User not found.", StatusCode = 404 };
+                return new OperationResult<string> { Message = "User not found.", StatusCode = 404 };
             }
         }
 

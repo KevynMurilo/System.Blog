@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Http;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
-using System.Blog.Application.Interfaces.Users;
 using System.Blog.Core.Contracts.Services;
 using Microsoft.Extensions.Caching.Memory;
 using System.Blog.Application.Responses;
+using System.Blog.Application.Interfaces.Users.Registration;
 
-namespace System.Blog.Application.UseCases.Users;
+namespace System.Blog.Application.UseCases.Users.Registration;
 
 public class InitiateUserRegistrationUseCase : IInitiateUserRegistrationUseCase
 {
@@ -31,12 +31,12 @@ public class InitiateUserRegistrationUseCase : IInitiateUserRegistrationUseCase
     public async Task<OperationResult<UserResponse>> ExecuteAsync(CreateUserDto userDto)
     {
         if (await _userRepository.GetByEmailAsync(userDto.Email.ToLower()) != null)
-            return new OperationResult<UserResponse> { ReqSuccess = false, Message = "Email already registered", StatusCode = 409 };
+            return new OperationResult<UserResponse> { Message = "Email already registered", StatusCode = 409 };
 
         User user = MapUserFromDto(userDto);
 
         if (!await ProcessUserPhotoAsync(userDto, user))
-            return new OperationResult<UserResponse> { ReqSuccess = false, Message = "Invalid file type. Only JPG, JPEG, and PNG are allowed.", StatusCode = 400 };
+            return new OperationResult<UserResponse> { Message = "Invalid file type. Only JPG, JPEG, and PNG are allowed.", StatusCode = 400 };
 
         string verificationCode = CodeGenerator.GenerateVerificationCode();
         _cache.Set(user.Email.ToLower(), (verificationCode, DateTime.UtcNow), TimeSpan.FromMinutes(15));
@@ -50,7 +50,7 @@ public class InitiateUserRegistrationUseCase : IInitiateUserRegistrationUseCase
 
     private async Task<bool> ProcessUserPhotoAsync(CreateUserDto userDto, User user)
     {
-        if (userDto.Photo == null) return true; 
+        if (userDto.Photo == null) return true;
 
         if (!IsValidFile(userDto.Photo)) return false;
 
