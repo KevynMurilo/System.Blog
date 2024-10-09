@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+namespace System.Blog.Infrastructure.Services;
+
 public class UnconfirmedUserCleanupService : BackgroundService
 {
     private readonly IServiceScopeFactory _serviceScopeFactory;

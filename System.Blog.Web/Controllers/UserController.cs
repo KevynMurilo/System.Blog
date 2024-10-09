@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Blog.Application.DTOs;
-using System.Blog.Application.Interfaces.Users;
 using Microsoft.Extensions.Caching.Memory;
+using System.Blog.Application.Interfaces.Users.Registration;
+using System.Blog.Application.Interfaces.Users.PasswordManagement;
+using System.Blog.Application.Interfaces.Users.UserManagement;
 
 namespace System.Blog.Web.Controllers;
 
@@ -9,23 +11,29 @@ namespace System.Blog.Web.Controllers;
 [Route("api/[controller]")]
 public class UserController : ControllerBase
 {
-    private readonly IGetAllUserUseCase _getAllUserUseCase;
+    private readonly IGetAllUsersUseCase _getAllUserUseCase;
     private readonly IInitiateUserRegistrationUseCase _initiateUserRegistrationUseCase;
     private readonly ICompleteUserRegistrationUseCase _completeUserRegistrationUseCase;
     private readonly IResendVerificationCodeUseCase _resendVerificationCodeUseCase;
+    private readonly IForgotPasswordUseCase _forgotPasswordUseCase;
+    private readonly IResetPasswordUseCase _resetPasswordUseCase;
     private readonly IMemoryCache _cache;
 
     public UserController(
-        IGetAllUserUseCase getAllUserUseCase,
+        IGetAllUsersUseCase getAllUserUseCase,
         IInitiateUserRegistrationUseCase initiateUserRegistrationUseCase,
         ICompleteUserRegistrationUseCase completeUserRegistrationUseCase,
         IResendVerificationCodeUseCase resendVerificationCodeUseCase,
+        IForgotPasswordUseCase forgotPasswordUseCase,
+        IResetPasswordUseCase resetPasswordUseCase,
         IMemoryCache cache)
     {
         _getAllUserUseCase = getAllUserUseCase;
         _initiateUserRegistrationUseCase = initiateUserRegistrationUseCase;
         _completeUserRegistrationUseCase = completeUserRegistrationUseCase;
         _resendVerificationCodeUseCase = resendVerificationCodeUseCase;
+        _forgotPasswordUseCase = forgotPasswordUseCase;
+        _resetPasswordUseCase = resetPasswordUseCase;
         _cache = cache;
     }
 
@@ -82,8 +90,34 @@ public class UserController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, $"An unexpected error has occurred. - {ex}");
-
         }
     }
 
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPasswordAsync(string email)
+    {
+        try
+        {
+            var result = await _forgotPasswordUseCase.ExecuteAsync(email);
+            return StatusCode(result.StatusCode, result.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An unexpected error has occurred. - {ex}");
+        }
+    }
+
+    [HttpPut("reset-password")]
+    public async Task<IActionResult> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
+    {
+        try
+        {
+            var result = await _resetPasswordUseCase.ExecuteAsync(resetPasswordDto);
+            return StatusCode(result.StatusCode, result.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"An unexpected error has occurred. - {ex}");
+        }
+    }
 }

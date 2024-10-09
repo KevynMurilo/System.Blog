@@ -1,8 +1,8 @@
 ﻿using System.Blog.Application.Responses;
 
-namespace System.Blog.Application.Interfaces.Users;
+namespace System.Blog.Application.Interfaces.Users.UserManagement;
 
-public interface IGetAllUserUseCase
+public interface IGetAllUsersUseCase
 {
     Task<OperationResult<IEnumerable<UserResponse>>> ExecuteAsync();
 }

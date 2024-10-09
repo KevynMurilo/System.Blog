@@ -37,4 +37,29 @@ public class EmailService : IEmailService
             await smtpClient.SendMailAsync(mail);
         }
     }
+
+    public async Task SendPasswordResetEmailAsync(string email, string resetCode, string name)
+    {
+        var smtpEmail = _configuration["EmailSettings:SmtpEmail"];
+        var smtpPassword = _configuration["EmailSettings:SmtpPassword"];
+        var smtpServer = _configuration["EmailSettings:SmtpServer"];
+        var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"]);
+
+        var mail = new MailMessage
+        {
+            From = new MailAddress(smtpEmail, "Kevyn.Dev"),
+            Subject = "Redefinição de Senha",
+            Body = EmailTemplates.GeneratePasswordResetEmailBody(resetCode, name),
+            IsBodyHtml = true
+        };
+
+        mail.To.Add(email);
+
+        using (var smtpClient = new SmtpClient(smtpServer, smtpPort))
+        {
+            smtpClient.Credentials = new System.Net.NetworkCredential(smtpEmail, smtpPassword);
+            smtpClient.EnableSsl = true;
+            await smtpClient.SendMailAsync(mail);
+        }
+    }
 }
