@@ -7,7 +7,6 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using System.Blog.Core.Contracts.Services;
-using Microsoft.Extensions.Caching.Memory;
 using System.Blog.Application.Responses;
 using System.Blog.Application.Interfaces.Users.Registration;
 
@@ -17,15 +16,15 @@ public class InitiateUserRegistrationUseCase : IInitiateUserRegistrationUseCase
 {
     private readonly IUserRepository _userRepository;
     private readonly IEmailService _emailService;
-    private readonly IMemoryCache _cache;
+    private readonly IRedisService _redisService; 
     private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png" };
     private const long MaxFileSize = 5 * 1024 * 1024; // 5 MB
 
-    public InitiateUserRegistrationUseCase(IUserRepository userRepository, IEmailService emailService, IMemoryCache cache)
+    public InitiateUserRegistrationUseCase(IUserRepository userRepository, IEmailService emailService, IRedisService redisService)
     {
         _userRepository = userRepository;
         _emailService = emailService;
-        _cache = cache;
+        _redisService = redisService;
     }
 
     public async Task<OperationResult<UserResponse>> ExecuteAsync(CreateUserDto userDto)
@@ -41,7 +40,8 @@ public class InitiateUserRegistrationUseCase : IInitiateUserRegistrationUseCase
                 return new OperationResult<UserResponse> { Message = "Invalid file type. Only JPG, JPEG, and PNG are allowed.", StatusCode = 400 };
 
             string verificationCode = CodeGenerator.GenerateVerificationCode();
-            _cache.Set(user.Email.ToLower(), (verificationCode, DateTime.UtcNow), TimeSpan.FromMinutes(15));
+
+            await _redisService.SetVerificationCodeAsync(user.Email.ToLower(), verificationCode);
 
             await _emailService.SendVerificationEmailAsync(user.Email, verificationCode, user.Name);
 

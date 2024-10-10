@@ -17,7 +17,6 @@ public class UserController : ControllerBase
     private readonly IResendVerificationCodeUseCase _resendVerificationCodeUseCase;
     private readonly IForgotPasswordUseCase _forgotPasswordUseCase;
     private readonly IResetPasswordUseCase _resetPasswordUseCase;
-    private readonly IMemoryCache _cache;
 
     public UserController(
         IGetAllUsersUseCase getAllUserUseCase,
@@ -25,8 +24,7 @@ public class UserController : ControllerBase
         ICompleteUserRegistrationUseCase completeUserRegistrationUseCase,
         IResendVerificationCodeUseCase resendVerificationCodeUseCase,
         IForgotPasswordUseCase forgotPasswordUseCase,
-        IResetPasswordUseCase resetPasswordUseCase,
-        IMemoryCache cache)
+        IResetPasswordUseCase resetPasswordUseCase)
     {
         _getAllUserUseCase = getAllUserUseCase;
         _initiateUserRegistrationUseCase = initiateUserRegistrationUseCase;
@@ -34,7 +32,6 @@ public class UserController : ControllerBase
         _resendVerificationCodeUseCase = resendVerificationCodeUseCase;
         _forgotPasswordUseCase = forgotPasswordUseCase;
         _resetPasswordUseCase = resetPasswordUseCase;
-        _cache = cache;
     }
 
     [HttpGet]

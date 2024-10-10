@@ -4,6 +4,7 @@ using System.Blog.Web.Configurations.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddRedisConfiguration(builder.Configuration);
 builder.Services.AddDatabaseConfiguration(builder.Configuration);
 builder.Services.AddHostedService<UnconfirmedUserCleanupService>();
 builder.Services.AddUserDependencies();
