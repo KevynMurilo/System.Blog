@@ -1,7 +1,6 @@
 ﻿using System.Blog.Application.Utils;
 using System.Blog.Core.Contracts.Repositories;
 using System.Blog.Core.Contracts.Services;
-using Microsoft.Extensions.Caching.Memory;
 using System.Blog.Application.Responses;
 using System.Blog.Application.Interfaces.Users.PasswordManagement;
 
@@ -11,30 +10,38 @@ public class ForgotPasswordUseCase : IForgotPasswordUseCase
 {
     private readonly IUserRepository _userRepository;
     private readonly IEmailService _emailService;
-    private readonly IMemoryCache _cache;
+    private readonly IRedisService _redisService; 
     private const int TokenValidityMinutes = 15;
 
-    public ForgotPasswordUseCase(IUserRepository userRepository, IEmailService emailService, IMemoryCache cache)
+    public ForgotPasswordUseCase(IUserRepository userRepository, IEmailService emailService, IRedisService redisService)
     {
         _userRepository = userRepository;
         _emailService = emailService;
-        _cache = cache;
+        _redisService = redisService;
     }
 
     public async Task<OperationResult<string>> ExecuteAsync(string email)
     {
-        var lowerEmail = email.ToLower();
-        var user = await _userRepository.GetByEmailAsync(lowerEmail);
-        if (user == null)
-            return new OperationResult<string> { Message = "User not found.", StatusCode = 404 };
+        try
+        {
+            var lowerEmail = email.ToLower();
+            var user = await _userRepository.GetByEmailAsync(lowerEmail);
+            if (user == null)
+                return new OperationResult<string> { Message = "User not found.", StatusCode = 404 };
 
-        var resetCode = CodeGenerator.GenerateVerificationCode();
-        var timestamp = DateTime.UtcNow;
+            var resetCode = CodeGenerator.GenerateVerificationCode();
+            var timestamp = DateTime.UtcNow;
 
-        _cache.Set(lowerEmail, (resetCode, timestamp), TimeSpan.FromMinutes(TokenValidityMinutes));
+            await _redisService.SetVerificationCodeAsync(lowerEmail, resetCode);
+            await _redisService.SetLastSentTimeAsync(lowerEmail, timestamp);
 
-        await _emailService.SendPasswordResetEmailAsync(user.Email, resetCode, user.Name);
+            await _emailService.SendPasswordResetEmailAsync(user.Email, resetCode, user.Name);
 
-        return new OperationResult<string> { Message = "Reset password code sent successfully.", StatusCode = 200 };
+            return new OperationResult<string> { Message = "Reset password code sent successfully.", StatusCode = 200 };
+        }
+        catch (Exception ex)
+        {
+            return new OperationResult<string> { ReqSuccess = false, Message = $"Unexpected error: {ex.Message}", StatusCode = 500 };
+        }
     }
 }

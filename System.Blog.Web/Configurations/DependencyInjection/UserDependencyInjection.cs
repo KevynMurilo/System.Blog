@@ -15,7 +15,6 @@ public static class UserDependencyInjection
 {
     public static IServiceCollection AddUserDependencies(this IServiceCollection services)
     {
-        services.AddMemoryCache();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IGetAllUsersUseCase, GetAllUsersUseCase>();
