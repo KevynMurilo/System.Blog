@@ -104,7 +104,7 @@
 | `PasswordHash`  | VARCHAR(255)                             | NOT NULL                                     |
 | `CreatedDate`   | DATETIME                                 | NOT NULL                                     |
 | `Role`          | ENUM('Admin', 'Writer', 'Reader')        | NOT NULL, DEFAULT 'Reader'                   |
-| `PhotoPath`     | VARCHAR(255)                             | NULL                                         |
+| `Photo`     | VARCHAR(255)                             | NULL                                         |
 | `IsActived`     | BOOLEAN                                  | NOT NULL, DEFAULT FALSE                      |
 
 ### **2. Tabela: `Category` (Categoria)**
@@ -113,7 +113,7 @@
 |--------------|----------------|---------------------------------|
 | `CategoryId` | UUID           | PRIMARY KEY                     |
 | `Name`       | VARCHAR(255)   | NOT NULL, UNIQUE, UPPERCASE     |
-| `PhotoPath`  | VARCHAR(255)   | NULL                            |
+| `Photo`  | VARCHAR(255)   | NULL                            |
 
 ### **3. Tabela: `Post` (Artigo)**
 
@@ -246,7 +246,7 @@
   - **Descrição**: Realiza o login e retorna um token JWT para o usuário.
   - **Parâmetros**:
     - `email`: string (obrigatório)
-    - `senha`: string (obrigatório)
+    - `password`: string (obrigatório)
   - **Resposta**:
     - 200 OK: Retorna o token JWT e Refresh token
     - 401 Unauthorized: Credenciais inválidas
@@ -254,11 +254,10 @@
 - **POST /api/auth/register**
   - **Descrição**: Realiza o cadastro de um novo usuário, incluindo a criação de um usuário com um e-mail único, senha criptografada, e um papel (role). A imagem de perfil será opcional, e o sistema enviará um código de verificação por e-mail para ativação do usuário.
   - **Parâmetros**:
-    - **`nome`**: `string` (obrigatório)  
+    - **`name`**: `string` (obrigatório)  
     - **`email`**: `string` (obrigatório, único)  
-    - **`senha`**: `string` (obrigatório)  
-    - **`role`**: `enum('Admin', 'Writer', 'Reader')` (obrigatório, valor padrão `Reader`)  
-    - **`fotoPerfil`**: `file` (opcional)  
+    - **`password`**: `string` (obrigatório)  
+    - **`photo`**: `file` (opcional)  
     
   - **Resposta**:
     - **201 Created**: Se o usuário for registrado com sucesso, será retornado um código de status **201 Created** com os detalhes do usuário e um código de verificação para ativação.
@@ -350,11 +349,11 @@
 - **POST /api/posts**
   - **Descrição**: Cria um novo post (autorização necessária).
   - **Parâmetros**:
-    - `titulo`: string (obrigatório) — O título do post.
+    - `title`: string (obrigatório) — O título do post.
     - `slug`: string (obrigatório, único) — O identificador único do post, geralmente gerado a partir do título.
-    - `conteudo`: string (obrigatório) — O conteúdo textual do post.
-    - `categoriaId`: UUID (obrigatório) — ID da categoria à qual o post pertence.
-    - `imagens`: array de arquivos (opcional) — Até 4 imagens podem ser anexadas ao post. As imagens serão armazenadas no servidor em uma pasta de uploads (não no banco de dados). Cada imagem deve ser enviada no formato multipart/form-data.
+    - `content`: string (obrigatório) — O conteúdo textual do post.
+    - `categoryId`: UUID (obrigatório) — ID da categoria à qual o post pertence.
+    - `pictures`: array de arquivos (opcional) — Até 4 imagens podem ser anexadas ao post. As imagens serão armazenadas no servidor em uma pasta de uploads (não no banco de dados). Cada imagem deve ser enviada no formato multipart/form-data.
   
   - **Resposta**:
     - **201 Created**: Post criado com sucesso, incluindo as imagens.
@@ -370,11 +369,11 @@ Atualiza um post existente (apenas o autor ou admin).
 
 #### **Parâmetros:**
 - `id`: UUID do post (obrigatório) — O identificador do post a ser atualizado.
-- `titulo`: string (opcional) — Novo título para o post.
+- `title`: string (opcional) — Novo título para o post.
 - `slug`: string (opcional) — Novo slug para o post.
-- `conteudo`: string (opcional) — Novo conteúdo do post.
-- `categoriaId`: UUID (opcional) — Nova categoria à qual o post pertence.
-- `imagens`: array de arquivos (opcional) — Até 4 imagens podem ser anexadas ao post. As imagens serão armazenadas no servidor em uma pasta de uploads. Caso novas imagens sejam enviadas, elas substituirão as anteriores.
+- `content`: string (opcional) — Novo conteúdo do post.
+- `categoryId`: UUID (opcional) — Nova categoria à qual o post pertence.
+- `pictures`: array de arquivos (opcional) — Até 4 imagens podem ser anexadas ao post. As imagens serão armazenadas no servidor em uma pasta de uploads. Caso novas imagens sejam enviadas, elas substituirão as anteriores.
 
 #### **Resposta:**
 - **200 OK**: Post atualizado com sucesso, incluindo as imagens, se fornecidas.
@@ -408,7 +407,7 @@ Atualiza um post existente (apenas o autor ou admin).
   - **Descrição**: Cria um novo comentário em um post (autorização necessária).
   - **Parâmetros**:
     - `postId`: UUID do post (obrigatório)
-    - `conteudo`: string (obrigatório)
+    - `content`: string (obrigatório)
     - `parentCommentId`: UUID (opcional, para respostas a outros comentários)
   - **Resposta**:
     - 201 Created: Comentário criado.
@@ -419,7 +418,7 @@ Atualiza um post existente (apenas o autor ou admin).
   - **Descrição**: Atualiza um comentário (somente o autor ou admin).
   - **Parâmetros**:
     - `id`: UUID do comentário
-    - `conteudo`: string (obrigatório)
+    - `content`: string (obrigatório)
   - **Resposta**:
     - 200 OK: Comentário atualizado.
     - 403 Forbidden: Usuário sem permissão.
@@ -468,7 +467,7 @@ Atualiza um post existente (apenas o autor ou admin).
 - **POST /api/categories**
   - **Descrição**: Cria uma nova categoria (somente admin).
   - **Parâmetros**:
-    - `nome`: string (obrigatório, único)
+    - `name`: string (obrigatório, único)
   - **Resposta**:
     - 201 Created: Categoria criada.
     - 403 Forbidden: Usuário sem permissão.
@@ -478,7 +477,7 @@ Atualiza um post existente (apenas o autor ou admin).
   - **Descrição**: Atualiza uma categoria (somente admin).
   - **Parâmetros**:
     - `id`: UUID da categoria
-    - `nome`: string (obrigatório)
+    - `name`: string (obrigatório)
   - **Resposta**:
     - 200 OK: Categoria atualizada.
     - 403 Forbidden: Usuário sem permissão.
@@ -505,7 +504,7 @@ Atualiza um post existente (apenas o autor ou admin).
 - **POST /api/tags**
   - **Descrição**: Cria uma nova tag (somente admin).
   - **Parâmetros**:
-    - `nome`: string (obrigatório, único)
+    - `name`: string (obrigatório, único)
   - **Resposta**:
     - 201 Created: Tag criada.
     - 403 Forbidden: Usuário sem permissão.
@@ -526,10 +525,10 @@ Atualiza um post existente (apenas o autor ou admin).
 - **POST /api/contact**
   - **Descrição**: Envia uma mensagem de contato via e-mail.
   - **Parâmetros**:
-    - `nome`: string (obrigatório)
+    - `name`: string (obrigatório)
     - `email`: string (obrigatório)
-    - `telefone`: string (opcional)
-    - `mensagem`: string (obrigatório)
+    - `phone`: string (opcional)
+    - `message`: string (obrigatório)
   - **Resposta**:
     - 200 OK: Mensagem enviada.
     - 400 Bad Request: Erro de validação.
