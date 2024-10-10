@@ -30,22 +30,29 @@ public class InitiateUserRegistrationUseCase : IInitiateUserRegistrationUseCase
 
     public async Task<OperationResult<UserResponse>> ExecuteAsync(CreateUserDto userDto)
     {
-        if (await _userRepository.GetByEmailAsync(userDto.Email.ToLower()) != null)
-            return new OperationResult<UserResponse> { Message = "Email already registered", StatusCode = 409 };
+        try
+        {
+            if (await _userRepository.GetByEmailAsync(userDto.Email.ToLower()) != null)
+                return new OperationResult<UserResponse> { Message = "Email already registered", StatusCode = 409 };
 
-        User user = MapUserFromDto(userDto);
+            User user = MapUserFromDto(userDto);
 
-        if (!await ProcessUserPhotoAsync(userDto, user))
-            return new OperationResult<UserResponse> { Message = "Invalid file type. Only JPG, JPEG, and PNG are allowed.", StatusCode = 400 };
+            if (!await ProcessUserPhotoAsync(userDto, user))
+                return new OperationResult<UserResponse> { Message = "Invalid file type. Only JPG, JPEG, and PNG are allowed.", StatusCode = 400 };
 
-        string verificationCode = CodeGenerator.GenerateVerificationCode();
-        _cache.Set(user.Email.ToLower(), (verificationCode, DateTime.UtcNow), TimeSpan.FromMinutes(15));
+            string verificationCode = CodeGenerator.GenerateVerificationCode();
+            _cache.Set(user.Email.ToLower(), (verificationCode, DateTime.UtcNow), TimeSpan.FromMinutes(15));
 
-        await _emailService.SendVerificationEmailAsync(user.Email, verificationCode, user.Name);
+            await _emailService.SendVerificationEmailAsync(user.Email, verificationCode, user.Name);
 
-        await _userRepository.AddAsync(user);
+            await _userRepository.AddAsync(user);
 
-        return new OperationResult<UserResponse> { Message = "User created successfully. Please verify your email.", StatusCode = 201 };
+            return new OperationResult<UserResponse> { Message = "User created successfully. Please verify your email.", StatusCode = 201 };
+        }
+        catch (Exception ex)
+        {
+            return new OperationResult<UserResponse> { ReqSuccess = false, Message = $"Unexpected error: {ex.Message}", StatusCode = 500 };
+        }
     }
 
     private async Task<bool> ProcessUserPhotoAsync(CreateUserDto userDto, User user)
